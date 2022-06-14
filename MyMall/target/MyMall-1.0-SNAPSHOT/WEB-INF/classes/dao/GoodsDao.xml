@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.GoodsDao">
+    <insert id="insertGoodsType">
+        insert into goods values (null,#{typeName})
+    </insert>
+    <insert id="insertGoods">
+        insert into goodsdetail values (null,#{goods.name},#{goods.typeId},#{goods.image},#{goods.description},#{price},#{stockNum})
+    </insert>
+    <insert id="insertGoodsSpec">
+        insert into goodsspec values (null,#{goodsId},#{name},#{stockNum},#{price})
+    </insert>
+    <insert id="insertGoodsAskMsg">
+        insert into goodsmsg values (null,#{userId},#{askGoodsMsg.goodsId},#{askGoodsMsg.msg},1,#{createTime},null,#{askGoodsMsg.token},#{goodsName},null)
+    </insert>
+    <update id="updateGoodsDetail">
+        update goodsdetail set typeId=#{goods.typeId}, name=#{goods.name}, image=#{goods.image}, description=#{goods.description}, price=#{price}, stockNum=#{stockNum} where id=#{goods.id}
+    </update>
+    <update id="updateGoodsSpec">
+        update goodsspec set name=#{specName}, stockNum=#{stockNum}, price=#{price} where id=#{id}
+    </update>
+    <update id="updateGoodsMsg">
+        update goodsmsg set state=0, replyContent=#{replyContent}, replyTime=#{replyTime} where id=#{id}
+    </update>
+    <delete id="deleteGoodsById">
+        delete from goodsdetail where id=#{id}
+    </delete>
+    <delete id="deleteGoodsSpecById">
+        delete from goodsspec where goodsId=#{id}
+    </delete>
+    <delete id="deleteGoodsMsgByGoodsId">
+        delete from goodsmsg where goodsId=#{id}
+    </delete>
+    <delete id="deleteOrderByGoodsId">
+        delete from orders where goodsId=#{id}
+    </delete>
+    <delete id="deleteGoodsTypeById">
+        delete from goods where id=#{id}
+    </delete>
+    <select id="queryAllGoodsType" resultType="model.vo.goods.GoodsTypeVO">
+        select id,name from goods
+    </select>
+    <select id="queryGoodsDetailByType" resultType="model.vo.goods.GoodsDetailVO">
+        select id,name,typeId,image as img ,description,price,stockNum from goodsdetail
+        <where>
+            <if test="typeId!=-1">
+                typeId=#{typeId}
+            </if>
+        </where>
+    </select>
+    <select id="queryGoodsType" resultType="java.lang.Integer">
+        select id from goods where name=#{typeName}
+    </select>
+    <select id="queryIsGoodsExist" resultType="java.lang.Integer">
+        select id from goodsdetail where name=#{name} and typeId=#{typeId}
+    </select>
+    <select id="queryGoodsIdById" resultType="java.lang.Integer">
+        select id from goodsdetail where id=#{id}
+    </select>
+    <select id="queryGoodsById" resultType="model.vo.goods.GoodsInfoDetailVO">
+        select id, name,typeId,image as img,description as `desc`, price as unitPrice from goodsdetail where id=#{id}
+    </select>
+    <select id="queryGoodsSpecById" resultType="model.vo.goods.GoodsInfoSpecVO">
+        select id,name as specName,stockNum, price as unitPrice from goodsspec where goodsId=#{id}
+    </select>
+    <select id="queryGoodsSpec" resultType="model.vo.goods.GoodsAddSpecVO">
+        select goodsId, name as specName, price as unitPrice, stockNum from goodsspec where goodsId=#{goodsId} and name=#{specName} and price=#{price} and stockNum=#{stockNum}
+    </select>
+    <select id="queryGoodsNoReplyMsg" resultType="model.vo.goods.GoodsNoReplyMsgVO">
+        select id, userId, goodsId, content, state, createTime as createtime, username, goodsname from goodsmsg where state=1
+    </select>
+    <select id="queryGoodsRepliedMsg" resultType="model.vo.goods.GoodsRepliedMsgVO">
+        select id, userId, goodsId, content, state, createTime as createtime, username, goodsname, replyContent from goodsmsg where state=0
+    </select>
+    <select id="queryGoodsByName" resultType="model.vo.goods.GoodsDetailVO">
+        select id, image as img, name, price, typeId from goodsdetail where name like concat("%", #{name}, "%")
+    </select>
+    <select id="queryGoodsMsgByGoodsId" resultType="model.vo.goods.GoodsMsgGetByUserVO">
+        select id, content, username as asker, createTime as time, replyContent, replyTime from goodsmsg where goodsId=#{goodsId}
+    </select>
+    <select id="queryOrderByGoodsId" resultType="model.vo.goods.GoodsCommentListVO">
+        select id, spec as specName, comment, createTime as time, userId, nickname, score from orders where goodsId=#{goodsId} and stateId=3
+    </select>
+    <select id="queryUserIdByNickname" resultType="java.lang.Integer">
+        select id from user where nickname=#{nickname}
+    </select>
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.OrderDao">
+    <insert id="insertGoodsMsg">
+        insert into goodsmsg values (null,#{userId},#{orderSendCommentBO.goodsId},#{orderSendCommentBO.content},3,#{createTime},null,#{orderSendCommentBO.token},#{goodsName},null)
+    </insert>
+    <insert id="insertOrder">
+        insert into orders values (null, #{userId},#{addOrder.token},#{receiver},#{address},#{phone},#{goods},#{goodsId},#{spec},#{specId},#{addOrder.num},#{addOrder.amount},#{addOrder.state},#{createTime},'false',0,null)
+    </insert>
+    <update id="updateOrder">
+        update orders set stateId=#{stateId}, specId=#{specId}, number=#{number} where id=#{id}
+    </update>
+    <update id="updateOrderStateById">
+        update orders set stateId=#{stateId} where id=#{id}
+    </update>
+    <update id="updateOrderCommentById">
+        update orders set hasComment='true', score=#{score}, comment=#{content} where id=#{orderId}
+    </update>
+    <update id="updateGoodsSpecStockNumById">
+        update goodsspec set stockNum = #{num} where id=#{id}
+    </update>
+    <update id="updateOrderById">
+        update orders set stateId=#{stateId} ,number=#{orderCartList.goodsNum}, amount=#{orderCartList.amount} where id=#{orderCartList.id}
+    </update>
+    <delete id="deleteOrder">
+        delete from orders where id=#{id}
+    </delete>
+
+    <select id="queryOrdersWithLimit" resultType="model.vo.order.OrdersVO">
+        select id, userId, goodsId as goodsDetailId, goods, spec, number as goodsNum, amount, stateId, nickname, receiver as name, address, phone from orders
+        <where>
+            <if test="order.id!=null and order.id!=''">
+                id=#{order.id}
+            </if>
+            <if test="order.address!=null and order.address!=''">
+                and address=#{order.address}
+            </if>
+            <if test="order.goods!=null and order.goods!=''">
+                and goods=#{order.goods}
+            </if>
+            <if test="order.nickname!=null and order.nickname!=''">
+                and nickname=#{order.nickname}
+            </if>
+            <if test="order.stateId!=-1">
+                and stateId=#{order.stateId}
+            </if>
+            <if test="moneyHighLimit!=null and moneyHighLimit!=''">
+                and amount&lt;=#{moneyHighLimit}
+            </if>
+            <if test="moneyLowLimit!=null and moneyLowLimit!=''">
+                and amount&gt;=#{moneyLowLimit}
+            </if>
+        </where>
+        limit #{currentLine},#{pagesize}
+    </select>
+    <select id="queryTotal" resultType="java.lang.Integer">
+        select count(*) from orders
+        <where>
+            <if test="order.id!=null and order.id!=''">
+                id=#{order.id}
+            </if>
+            <if test="order.address!=null and order.address!=''">
+                and address=#{order.address}
+            </if>
+            <if test="order.goods!=null and order.goods!=''">
+                and goods=#{order.goods}
+            </if>
+            <if test="order.nickname!=null and order.nickname!=''">
+                and nickname=#{order.nickname}
+            </if>
+            <if test="order.stateId!=-1">
+                and stateId=#{order.stateId}
+            </if>
+        </where>
+    </select>
+    <select id="queryOrdersById" resultType="model.vo.order.OrdersUpdateGetVO">
+        select id, amount, number as num, goodsId as goodsDetailId, goods, stateId as state, specId from orders where id=#{id}
+    </select>
+    <select id="queryGoodsSpecById" resultType="model.vo.order.OrderSpecVO">
+        select id, name as specName, price as UnitPrice from goodsspec where id=#{id}
+    </select>
+    <select id="queryOrdersByStateAndNickname" resultType="model.vo.order.OrderStateAndTokenVO">
+        select id, stateId as state, number as goodsNum, amount, goodsId as goodsDetailId, createTime as createtime, hasComment, specId from orders
+        <where>
+            <if test="stateId!=-1">
+                stateId=#{stateId}
+            </if>
+            and nickname=#{nickname}
+        </where>
+    </select>
+    <select id="queryGoodsSpecBySpecId" resultType="model.vo.order.OrderStateAndTokenVO">
+        select name as spec, price as unitPrice, goodsId as goodsDetailId,stockNum as goodsNum from goodsspec where id=#{specId}
+    </select>
+    <select id="queryGoodsById" resultType="model.vo.order.OrderStateAndTokenVO">
+        select image as img, name from goodsdetail where id=#{goodsDetailId}
+    </select>
+    <select id="queryUserIdByNickname" resultType="java.lang.Integer">
+        select id from user where nickname=#{nickname}
+    </select>
+    <select id="queryGoodsNameById" resultType="java.lang.String">
+        select name from goodsdetail where id=#{id}
+    </select>
+    <select id="queryUserByNickname" resultType="model.po.User">
+        select id, nickname, recipient, address, phone from user where nickname=#{nickname}
+    </select>
+</mapper>

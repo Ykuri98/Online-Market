@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.AdminDao">
+    <insert id="addAdmin">
+        insert into admin values (null,#{username},#{password},#{nickname})
+    </insert>
+
+    <update id="updateAdmin">
+        update admin set password=#{password}, nickname=#{nickname} where id=#{id}
+    </update>
+
+    <update id="updateAdminPwd">
+        update admin set password=#{password} where nickname=#{nickname}
+    </update>
+
+    <delete id="deleteAdmin">
+        delete from admin where id=#{id}
+    </delete>
+
+    <select id="queryNickname" resultType="java.lang.String">
+        select nickname from admin where username=#{username} and password=#{password}
+    </select>
+
+    <select id="queryAllAdmin" resultType="model.vo.admin.AdminInfoVO">
+        select id, username as email, password as pwd, nickname from admin
+    </select>
+
+    <select id="isAdminExist" resultType="java.lang.Integer">
+        select id from admin where username=#{username}
+    </select>
+
+    <select id="queryAdmin" resultType="model.vo.admin.AdminInfoVO">
+        select id, username as email, password as pwd, nickname from admin
+        <where>
+            <if test="id != null and id != ''">
+                id=#{id}
+            </if>
+            <if test="username != null and username != ''">
+                and username=#{username}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname=#{nickname}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAdminByNickname" resultType="java.lang.Integer">
+        select id from admin where password=#{password} and nickname=#{nickname}
+    </select>
+</mapper>
